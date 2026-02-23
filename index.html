@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SCARAX | Sistema Robótico SCARA Ferroviario</title>
+
+<style>
+:root{
+    --steel-blue:#4f6d8a;
+    --steel-accent:#6f8fa8;
+    --industrial-dark:#1a1f26;
+    --industrial-panel:#232a33;
+    --industrial-border:#3a4654;
+    --industrial-glow:0 0 8px rgba(79,109,138,0.4);
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+
+body{
+    font-family:"Courier New",monospace;
+    background:var(--industrial-dark);
+    color:var(--steel-accent);
+    overflow-x:hidden;
+}
+
+body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    background-image:
+        linear-gradient(rgba(120,130,140,0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(120,130,140,0.06) 1px, transparent 1px);
+    background-size:40px 40px;
+    pointer-events:none;
+}
+
+body::after{
+    content:"ARCHIVO CLASIFICADO";
+    position:fixed;
+    top:50%;
+    left:50%;
+    transform:translate(-50%, -50%) rotate(-25deg);
+    font-size:6rem;
+    font-weight:bold;
+    color:rgba(120,130,140,0.08);
+    letter-spacing:12px;
+    white-space:nowrap;
+    pointer-events:none;
+    z-index:0;
+}
+
+#intro{
+    position:fixed;
+    inset:0;
+    background:radial-gradient(circle at center,#2a313b 0%,#11161c 80%);
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    z-index:9999;
+}
+
+.scan-line{
+    position:absolute;
+    width:100%;
+    height:2px;
+    background:linear-gradient(90deg,transparent,#3aa8ff,transparent);
+    animation:scanMove 4s linear infinite;
+    opacity:0.6;
+}
+
+@keyframes scanMove{
+    0%{top:0}
+    100%{top:100%}
+}
+
+#terminal{
+    width:85%;
+    max-width:1000px;
+    white-space:pre-wrap;
+    font-size:1rem;
+    color:#9fb3c8; text-shadow:none;
+    text-shadow:0 0 10px #4de0c8;
+    min-height:180px;
+    letter-spacing:1.5px;
+    text-transform:uppercase;
+}
+
+.logo{
+    position:relative;
+    font-size:5rem;
+    font-weight:bold;
+    color:var(--steel-accent);
+    display:none;
+}
+
+/* MITAD SUPERIOR EXACTA */
+.logo::before{
+    content:attr(data-text);
+    position:absolute;
+    left:0;
+    top:0;
+    width:100%;
+    clip-path:inset(0 0 50% 0);
+    transform:translateY(0);
+}
+
+/* MITAD INFERIOR EXACTA */
+.logo::after{
+    content:attr(data-text);
+    position:absolute;
+    left:0;
+    top:0;
+    width:100%;
+    clip-path:inset(50% 0 0 0);
+    transform:translateY(0);
+}
+
+/* EFECTO CORTE SUAVE (sin vibración) */
+.logo.glitch::before{
+    transform:translateY(-10px);
+    transition:transform 0.25s ease;
+}
+
+.logo.glitch::after{
+    transform:translateY(10px);
+    transition:transform 0.25s ease;
+}
+
+@keyframes logoReveal{
+    from{opacity:0;transform:scale(0.95)}
+    to{opacity:1;transform:scale(1)}
+}
+    to{opacity:1;transform:scale(1)}
+}
+
+#main{display:none;padding:60px 8%}
+
+.hud-panel{
+    background:var(--industrial-panel);
+    border:1px solid var(--industrial-border);
+    padding:30px;
+    margin-bottom:60px;
+    box-shadow:var(--industrial-glow);
+}
+
+.main-title{
+    font-size:4.5rem;
+    letter-spacing:8px;
+    font-weight:bold;
+    color:#e0e6ed;
+    text-align:center;
+    margin-bottom:10px;
+    text-shadow:0 0 25px rgba(120,160,200,0.6);
+}
+
+h2{
+    margin-bottom:20px;
+    color:#9fb3c8;
+    letter-spacing:2px;
+}
+p,li{color:#c7d1db;margin-bottom:10px}
+ul{margin-left:20px}
+
+</style>
+</head>
+<body>
+
+<div id="intro">
+    <div class="scan-line"></div>
+    <div id="terminal"></div>
+    <div class="logo" id="logo" data-text="SCARAX">SCARAX</div>
+</div>
+
+<div id="main">
+
+<!-- TÍTULO PRINCIPAL -->
+<div class="hud-panel">
+<h1 class="main-title">SCARAX</h1>
+<h2 style="margin-top:0;">Sistema Robótico SCARA Integrado en Plataforma Ferroviaria</h2>
+<p>Plataforma robótica compacta diseñada para automatización ligera, integración logística y desarrollo técnico aplicado. El sistema combina arquitectura SCARA optimizada, electrónica programable y control cinemático avanzado, integrando principios de ingeniería mecánica, electrónica de potencia y software de control en una sola unidad estructural. SCARAX ha sido concebido como un sistema técnico modular capaz de operar en entornos experimentales, educativos e industriales ligeros, priorizando estabilidad estructural, eficiencia energética y repetibilidad operativa. Su diseño responde a criterios de simplicidad mecánica, mantenimiento accesible y compatibilidad con plataformas de desarrollo abiertas.</p>
+</div>
+
+<!-- PRESENTACIÓN -->
+<div class="hud-panel">
+<h2>PRESENTACIÓN</h2>
+<p>SCARAX es un manipulador robótico de tres ejes principales configurado bajo arquitectura SCARA (RR + eje Z prismático). El sistema ha sido desarrollado con enfoque en precisión geométrica, repetibilidad angular y eficiencia energética, permitiendo ejecutar trayectorias controladas con bajo consumo eléctrico y mínima vibración estructural. La configuración cinemática seleccionada reduce complejidad mecánica respecto a robots antropomórficos, manteniendo alta velocidad de desplazamiento horizontal y control estable en el eje vertical. Esta combinación lo convierte en una plataforma adecuada para pruebas de automatización ligera y validación de microprocesos logísticos.</p>
+<p>Su implementación sobre plataforma ferroviaria permite validar automatización móvil en entornos logísticos reales, manteniendo estructura modular y capacidad de escalabilidad técnica.</p>
+</div>
+
+<!-- INTRODUCCIÓN -->
+<div class="hud-panel">
+<h2>INTRODUCCIÓN TÉCNICA</h2>
+<p>El diseño del SCARAX responde a principios de cinemática planar optimizada, reducción mecánica calibrada y control digital programable. La arquitectura SCARA ofrece alta velocidad en desplazamientos horizontales con bajo consumo energético y estructura mecánica simplificada, reduciendo masa inercial en los extremos del brazo y mejorando la estabilidad dinámica durante aceleraciones y desaceleraciones. El dimensionamiento de poleas y relaciones de transmisión fue calculado para equilibrar torque disponible y resolución angular, garantizando movimientos suaves y controlados dentro del área operativa definida.</p>
+<p>El sistema integra control por software desarrollado en Python, cálculo de cinemática directa e inversa y gestión precisa de actuadores paso a paso. Esta combinación permite trayectorias interpoladas, repetibilidad estable y operación controlada en entornos experimentales o productivos ligeros.</p>
+</div>
+
+
+<!-- 1. ARQUITECTURA -->
+<div class="hud-panel">
+<h2>ARQUITECTURA DEL SISTEMA SCARAX</h2>
+<p>SCARAX es un manipulador robótico tipo SCARA compuesto por dos articulaciones rotacionales coplanares (hombro y codo) y un eje prismático vertical (Z). La arquitectura está optimizada para movimientos rápidos en plano horizontal con alta repetibilidad.</p>
+<ul>
+<li>Barrido angular aproximado: 315°</li>
+<li>Área operativa: 1190 cm²</li>
+<li>Configuración cinemática: RR + eje Z prismático</li>
+<li>Reducción total antebrazo: ~7,28:1</li>
+</ul>
+</div>
+
+<!-- 2. MECÁNICA -->
+<div class="hud-panel">
+<h2>DISEÑO MECÁNICO Y ESTRUCTURAL</h2>
+<p>La estructura incorpora refuerzos triangulados y distribución optimizada de cargas para minimizar vibraciones y torsiones durante aceleraciones. La geometría estructural busca mantener alineación entre ejes y reducir flexión en el antebrazo bajo carga nominal. El eje Z utiliza varilla roscada de 2 mm por revolución con guiado mediante rodamientos lineales LM8UU / LM8LUU, permitiendo desplazamientos verticales controlados con buena resolución lineal. El conjunto mecánico ha sido configurado para facilitar desmontaje parcial, inspección y ajuste periódico sin comprometer la integridad estructural del sistema.</p>
+<ul>
+<li>Altura total: 270 mm</li>
+<li>Longitud de brazo: 24 cm</li>
+<li>Peso total: 2120 g</li>
+<li>Carga útil máxima: ~150 g</li>
+<li>Velocidad horizontal: 22 mm/s</li>
+<li>Velocidad vertical: 25 mm/s</li>
+</ul>
+</div>
+
+<div class="hud-panel">
+<h2>LISTA DE MATERIALES (BOM)</h2>
+<ul>
+<li>3 × Motores NEMA17 alto par</li>
+<li>2 × Servos MG90 / MG92R</li>
+<li>Correas y poleas GT2 (16, 62, 72 dientes)</li>
+<li>Rodamientos LM8UU / LM8LUU / 623ZZ / 608ZZ / 6002RS</li>
+<li>Varilla roscada eje Z + tuerca</li>
+<li>Barras acero inoxidable Ø8 mm</li>
+<li>Tornillería M3 (80–100 unidades)</li>
+</ul>
+</div>
+
+<!-- 3. ELECTRÓNICA -->
+<div class="hud-panel">
+<h2>ELECTRÓNICA DE POTENCIA Y CONTROL</h2>
+<p>El sistema utiliza placa DEVIA basada en arquitectura ARM Cortex M0 compatible con entorno Arduino. Controla tres motores paso a paso mediante drivers A4988 con regulación de corriente ajustable y disipación térmica, además de dos servomotores dedicados al sistema de sujeción. La electrónica ha sido distribuida para minimizar interferencias y mantener rutas de potencia separadas de señales lógicas, mejorando estabilidad eléctrica y confiabilidad operativa. El diseño permite futuras expansiones mediante módulos adicionales de comunicación o sensores externos.</p>
+<ul>
+<li>Alimentación: 12V DC</li>
+<li>Drivers con disipadores térmicos</li>
+<li>Conectividad USB y expansión WiFi</li>
+<li>Configuración de corriente ajustable</li>
+</ul>
+</div>
+
+<!-- 4. CONTROL -->
+<div class="hud-panel">
+<h2>INGENIERÍA DE CONTROL Y SOFTWARE</h2>
+<p>El software está desarrollado en Python e implementa modelos de cinemática directa e inversa para el cálculo preciso de coordenadas X‑Y‑Z en tiempo real. El sistema traduce posiciones cartesianas en ángulos articulares considerando límites físicos y relaciones de transmisión mecánica. Soporta interpolación lineal y circular de trayectorias, control progresivo de aceleración y desaceleración, así como comunicación serial bidireccional para monitoreo continuo de estados. La arquitectura de código está estructurada en módulos independientes, facilitando mantenimiento, actualización y ampliación funcional.</p>
+<ul>
+<li>Trayectorias hasta 20.000 puntos</li>
+<li>Interpolación progresiva de aceleración</li>
+<li>Comunicación serial bidireccional</li>
+<li>Integración opcional con OpenCV y Blockly</li>
+</ul>
+</div>
+
+<!-- 5. RENDIMIENTO -->
+<div class="hud-panel">
+<h2>ANÁLISIS DE RENDIMIENTO</h2>
+<p>La reducción mecánica optimiza el torque disponible en ejes principales, mejorando precisión angular y estabilidad dinámica frente a variaciones de carga ligera. El sistema presenta comportamiento estable dentro del rango operativo nominal, manteniendo repetibilidad entre 0,2 y 0,4 mm bajo condiciones controladas. La relación de transmisión contribuye a disminuir efecto de microvibraciones y mejora la resolución efectiva en posicionamiento angular, lo que resulta adecuado para tareas de manipulación repetitiva de baja masa.</p>
+<ul>
+<li>Optimización de torque para carga liviana</li>
+<li>Reducción de backlash mediante tensión calibrada</li>
+<li>Eficiencia energética estable en operación continua</li>
+</ul>
+</div>
+
+<!-- 6. SEGURIDAD -->
+<div class="hud-panel">
+<h2>SEGURIDAD OPERATIVA</h2>
+<ul>
+<li>Límites programados por software</li>
+<li>Protección contra sobrecorriente en drivers</li>
+<li>Desconexión ante pérdida de comunicación</li>
+<li>Posibilidad de botón de parada de emergencia (E‑STOP)</li>
+</ul>
+</div>
+
+<!-- 7. MANTENIMIENTO -->
+<div class="hud-panel">
+<h2>MANTENIMIENTO PREVENTIVO</h2>
+<ul>
+<li>Revisión mecánica cada 100 horas</li>
+<li>Verificación de tensión de correas</li>
+<li>Lubricación ligera de varilla roscada</li>
+<li>Chequeo térmico de drivers</li>
+</ul>
+</div>
+
+<!-- 8. INTEGRACIÓN FERROVIARIA -->
+<div class="hud-panel">
+<h2>INTEGRACIÓN SOBRE VAGÓN FERROVIARIO</h2>
+<p>SCARAX se encuentra instalado sobre vagón de carga adaptado, con base estructural anclada directamente al chasis mediante puntos de fijación reforzados y elementos de amortiguación diseñados para mitigar vibraciones propias del entorno ferroviario. La integración contempla distribución de masas, estabilidad durante desplazamiento y protección de componentes electrónicos frente a variaciones mecánicas. Esta configuración permite evaluar automatización ligera en nodos logísticos nacionales, transformando el vagón en una plataforma móvil de experimentación tecnológica aplicada.</p>
+<ul>
+<li>Clasificación automatizada de paquetes livianos</li>
+<li>Asistencia en carga y descarga técnica</li>
+<li>Operación en estaciones y centros logísticos</li>
+<li>Plataforma móvil de automatización ferroviaria</li>
+</ul>
+</div>
+
+</div>
+
+<script>
+(function(){
+
+    const lines = [
+        "INICIALIZANDO SISTEMA SCARAX...",
+        "CARGANDO MODULOS DE CONTROL...",
+        "VERIFICANDO ACTUADORES...",
+        "CALIBRANDO EJES...",
+        "SISTEMA LISTO"
+    ];
+
+    const terminal = document.getElementById("terminal");
+    const logo = document.getElementById("logo");
+    const intro = document.getElementById("intro");
+    const main = document.getElementById("main");
+
+    let lineIndex = 0;
+    let charIndex = 0;
+
+    function typeLine(){
+        if(lineIndex >= lines.length){
+            showLogo();
+            return;
+        }
+
+        if(charIndex < lines[lineIndex].length){
+            terminal.textContent += lines[lineIndex].charAt(charIndex);
+            charIndex++;
+            setTimeout(typeLine, 20);
+        } else {
+            terminal.textContent += "\n";
+            lineIndex++;
+            charIndex = 0;
+            setTimeout(typeLine, 200);
+        }
+    }
+
+    function showLogo(){
+        setTimeout(function(){
+            terminal.style.opacity = "0";
+            setTimeout(function(){
+                terminal.style.display = "none";
+                logo.style.display = "block";
+
+                // Espera 2 segundos estable
+                setTimeout(function(){
+                    logo.classList.add("glitch");
+
+                    // Se abre y vuelve a cerrarse (efecto único)
+                    setTimeout(function(){
+                        logo.classList.remove("glitch");
+                    },400);
+
+                },2000);
+
+                setTimeout(function(){
+                    intro.style.transition = "opacity 1s ease";
+                    intro.style.opacity = "0";
+                    setTimeout(function(){
+                        intro.remove();
+                        main.style.display = "block";
+                    },1000);
+                },3000);
+
+            },500);
+        },500);
+    }
+
+    document.addEventListener("DOMContentLoaded", function(){
+        setTimeout(typeLine, 500);
+    });
+
+})();
+</script>
+
+</body>
+</html>
